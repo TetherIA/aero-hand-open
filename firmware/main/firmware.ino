@@ -6,6 +6,7 @@
 #include <Preferences.h>
 #include "HandConfig.h"
 #include "Homing.h"
+#include "esp_system.h"
 
 HLSCL hlscl;
 Preferences prefs;
@@ -42,8 +43,8 @@ static const uint16_t HOLD_MAG = 5;       // the minimal torque actually command
 static int16_t g_lastTorqueCmd[7] = {0};
 
 // ---- Thermal torque limiting (GLOBAL PARAMETERS) ----
-static uint8_t  TEMP_CUTOFF_C    = 50;    // °C cutoff
-static uint16_t HOT_TORQUE_LIMIT = 200;   // clamp torque when motor exceeds TEMP_CUTOFF_C 
+static uint8_t  TEMP_CUTOFF_C    = 70;    // °C cutoff
+static uint16_t HOT_TORQUE_LIMIT = 500;   // clamp torque when motor exceeds TEMP_CUTOFF_C 
 
 // ----- Registers / constants (Mapped as per Feetech Servo HLS3606M) -----
 #define REG_ID                 0x05       // ID register
@@ -607,10 +608,22 @@ void setup() {
   #else
     Serial.println("[BOOT] Hand Type: UNKNOWN");
   #endif
-  Serial.println("[BOOT] Auto Homing…");
-  HOMING_start();
-  saveExtendsToNVS();
-  Serial.println("[BOOT] Homing Complete");
+
+  esp_reset_reason_t reason = esp_reset_reason();
+  bool do_homing = false;
+  if (reason == ESP_RST_POWERON) {
+    do_homing = true;
+  }
+  else if (reason == ESP_RST_BROWNOUT) {
+    do_homing = true;   // Power-dipped but not fully to 0V, optional but recommended for safety
+  }
+  if (do_homing) {
+    Serial.println("[BOOT] Power-on detected → homing");
+    HOMING_start();
+    saveExtendsToNVS();
+  } else {
+    Serial.println("[BOOT] Non-power reset → skipping homing");
+  }
   // ---- Presence Check on Every Boot -----
   Serial.println("\n[Init] Pinging servos...");
   for (uint8_t i = 0; i < 7; ++i) {
