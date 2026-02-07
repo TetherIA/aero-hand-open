@@ -1,5 +1,11 @@
 # Release Notes
 
+## 2026-02-06
+
+### Firmware v0.1.4
+- Update the overheat protection to be 70 degreee and 500 torque
+- Remove auto-homing when serial is closed
+
 ## 2026-01-20
 
 ### ROS2 Release
