@@ -10,6 +10,11 @@ const ServoData sd_base_right[7] = {
   {910,2048,-1},{2048,3231,1},{4095,1115,-1},{0,3278,1},{0,3278,1},{0,3278,1},{0,3278,1},
 };
 
+// ---- Servo Presence Check and Current Limit Parameters ------------
+static const uint8_t NUM_SERVOS = sizeof(SERVO_IDS) / sizeof(SERVO_IDS[0]);
+static const uint16_t SERVO_CURRENT_LIMIT_MAX = 1023;
+static const uint8_t REG_CURRENT_LIMIT = 28;
+
 // ----------------------- Utilities -----------------------
 void resetSdToBaseline() {
 #if defined(RIGHT_HAND)
@@ -31,6 +36,25 @@ bool HOMING_isBusy() { return s_busy; }
 static const float BUF_DEG = 10.0f;
 static const uint16_t BUF_CNT =(uint16_t) ((BUF_DEG/360.0f) *4095.0f);
 
+// -------Servo Presence + Current Limit Check (Post Homing) -------
+static void enforceServoCurrentLimitPostHoming() {
+  for (uint8_t i = 0; i < NUM_SERVOS; ++i) {
+    const uint8_t id = SERVO_IDS[i];
+    (void)hlscl.Ping(id);
+    if (hlscl.getLastError()) {
+      continue;
+    }
+    int cur = hlscl.readWord(id, REG_CURRENT_LIMIT);
+    if (hlscl.getLastError() || cur < 0) {
+      continue;
+    }
+    if ((uint16_t)cur != SERVO_CURRENT_LIMIT_MAX) {
+      (void)hlscl.unLockEprom(id);
+      (void)hlscl.writeWord(id, REG_CURRENT_LIMIT, SERVO_CURRENT_LIMIT_MAX);
+      (void)hlscl.LockEprom(id);
+    }
+  }
+}
 static void set_servo_limits(uint8_t servoID, uint16_t minLim, uint16_t maxLim) {
   // clamp to 12-bit range just in case
   if (minLim > 4095) minLim = 4095;
@@ -188,5 +212,6 @@ void zero_all_motors() {
 void HOMING_start() {
   s_busy = true;
   zero_all_motors();
+  enforceServoCurrentLimitPostHoming();
   s_busy = false;
 }

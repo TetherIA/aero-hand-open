@@ -615,7 +615,7 @@ void setup() {
     do_homing = true;
   }
   else if (reason == ESP_RST_BROWNOUT) {
-    do_homing = true;   // Power-dipped but not fully to 0V, optional but recommended for safety
+    do_homing = true;   // Power-dipped but not fully to 0v , Optional but recommended for safety
   }
   if (do_homing) {
     Serial.println("[BOOT] Power-on detected → homing");
@@ -624,22 +624,10 @@ void setup() {
   } else {
     Serial.println("[BOOT] Non-power reset → skipping homing");
   }
-  // ---- Presence Check on Every Boot -----
-  Serial.println("\n[Init] Pinging servos...");
-  for (uint8_t i = 0; i < 7; ++i) {
-    uint8_t id = SERVO_IDS[i];
-    int resp = hlscl.Ping(id);
-    if (!hlscl.getLastError()) {
-      Serial.print("  ID "); Serial.print(id); Serial.println(": OK");
-    } else {
-      Serial.print("  ID "); Serial.print(id); Serial.println(": NO REPLY");
-    }
-  }
+
   //Syncreadbegin to Start the syncread
   hlscl.syncReadBegin(sizeof(SERVO_IDS), REG_BLOCK_LEN, /*rx_fix*/ 8);
 
-  for (int i = 0; i < 7; ++i){
-  Serial.printf("Servo %d dir=%d\n", i, sd[i].servo_direction);}
   //Initialisation of Mutex and Task serial pinned to Core 1
   gBusMux =xSemaphoreCreateMutex();
   gMetricsMux = xSemaphoreCreateMutex();
