@@ -1,5 +1,10 @@
 # Release Notes
 
+## 2026-02-12
+
+### Firmware v0.1.5
+- If the motors are not configured correctly during assembly by accident, e.g. if the toruqe limit is incorrectly set as 800, fix it during homing.
+
 ## 2026-02-06
 
 ### Firmware v0.1.4
