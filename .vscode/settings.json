@@ -1,0 +1,32 @@
+{
+    "cmake.sourceDirectory": "/home/mohit/aero-hand-open/ros2/src/aero_hand_open_msgs",
+    "ROS2.distro": "humble",
+    "python.autoComplete.extraPaths": [
+        "/home/mohit/aero-open-ros2/build/webcam_mocap",
+        "/home/mohit/aero-open-ros2/install/webcam_mocap/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/robot_arms",
+        "/home/mohit/aero-open-ros2/install/robot_arms/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open_retargeting",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_retargeting/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/install/manus_ros2_msgs/local/lib/python3.10/dist-packages",
+        "/home/mohit/aero-open-ros2/build/gello_controller",
+        "/home/mohit/aero-open-ros2/install/gello_controller/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/apple_vision_pro_teleop",
+        "/home/mohit/aero-open-ros2/install/apple_vision_pro_teleop/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/apple_vision_pro_mocap",
+        "/home/mohit/aero-open-ros2/install/apple_vision_pro_mocap/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open_rl",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_rl/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open_normalize",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_normalize/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_msgs/local/lib/python3.10/dist-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open_description",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_description/lib/python3.10/site-packages",
+        "/home/mohit/aero-open-ros2/build/aero_hand_open_demos",
+        "/home/mohit/aero-open-ros2/install/aero_hand_open_demos/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}
