@@ -4,6 +4,7 @@ scipy
 matplotlib
 pyyaml
 mediapipe>=0.10,<0.11
+protobuf>=3.20,<4
 opencv-python<4.10
 pyserial
 dex_retargeting

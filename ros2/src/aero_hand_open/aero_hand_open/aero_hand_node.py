@@ -34,7 +34,7 @@ class AeroHandNode(Node):
         self.declare_parameter("feedback_frequency", 100.0)
         self.declare_parameter("control_space", "joint")
         self.declare_parameter("speed", 32766) # from 0 to 32766
-        self.declare_parameter("torque", 1000) # from 0 to 1000
+        self.declare_parameter("torque", 700) # from 0 to 1000
 
         right_port = self.get_parameter("right_port").value
         left_port = self.get_parameter("left_port").value
@@ -45,7 +45,7 @@ class AeroHandNode(Node):
         torque = self.get_parameter("torque").value
         
         ## Initialize hands and subscribers/publishers based on provided ports
-        if right_port != "":
+        if right_port not in ("", "none"):
             try:
                 if right_port == "auto":
                     right_port = None  # auto detect port
@@ -57,32 +57,36 @@ class AeroHandNode(Node):
                 self.get_logger().error(
                     f"Failed to initialize Right hand on port {right_port}: {e}"
                 )
-                raise e
-            if control_space == "joint":
-                self.joint_states_sub_right = self.create_subscription(
-                    JointControl,
-                    "right/joint_control",
-                    self.joint_states_right_callback,
-                    10,
-                )
-            elif control_space == "actuator":
-                self.actuator_control_sub_right = self.create_subscription(
-                    ActuatorControl,
-                    "right/actuator_control",
-                    self.actuator_control_right_callback,
-                    10,
-                )
-            else:
-                self.get_logger().error(f"Invalid control space: {control_space}")
-                raise ValueError(
-                    f'Invalid control space: {control_space}, expected "joint" or "actuator"'
+                self.get_logger().warn(
+                    "Right hand will be unavailable. The node will continue without it."
                 )
 
-            self.hand_state_pub_right = self.create_publisher(
-                ActuatorStates, "right/actuator_states", 10
-            )
+            if hasattr(self, "right_hand"):
+                if control_space == "joint":
+                    self.joint_states_sub_right = self.create_subscription(
+                        JointControl,
+                        "right/joint_control",
+                        self.joint_states_right_callback,
+                        10,
+                    )
+                elif control_space == "actuator":
+                    self.actuator_control_sub_right = self.create_subscription(
+                        ActuatorControl,
+                        "right/actuator_control",
+                        self.actuator_control_right_callback,
+                        10,
+                    )
+                else:
+                    self.get_logger().error(f"Invalid control space: {control_space}")
+                    raise ValueError(
+                        f'Invalid control space: {control_space}, expected "joint" or "actuator"'
+                    )
 
-        if left_port != "":
+                self.hand_state_pub_right = self.create_publisher(
+                    ActuatorStates, "right/actuator_states", 10
+                )
+
+        if left_port not in ("", "none"):
             try:
                 if left_port == "auto":
                     left_port = None  # auto detect port
@@ -94,38 +98,53 @@ class AeroHandNode(Node):
                 self.get_logger().error(
                     f"Failed to initialize Left hand on port {left_port}: {e}"
                 )
-                raise e
-            if control_space == "joint":
-                self.joint_states_sub_left = self.create_subscription(
-                    JointControl,
-                    "left/joint_control",
-                    self.joint_states_left_callback,
-                    10,
-                )
-            elif control_space == "actuator":
-                self.actuator_control_sub_left = self.create_subscription(
-                    ActuatorControl,
-                    "left/actuator_control",
-                    self.actuator_control_left_callback,
-                    10,
-                )
-            else:
-                self.get_logger().error(f"Invalid control space: {control_space}")
-                raise ValueError(
-                    f'Invalid control space: {control_space}, expected "joint" or "actuator"'
+                self.get_logger().warn(
+                    "Left hand will be unavailable. The node will continue without it."
                 )
 
-            self.hand_state_pub_left = self.create_publisher(
-                ActuatorStates, "left/actuator_states", 10
-            )
+            if hasattr(self, "left_hand"):
+                if control_space == "joint":
+                    self.joint_states_sub_left = self.create_subscription(
+                        JointControl,
+                        "left/joint_control",
+                        self.joint_states_left_callback,
+                        10,
+                    )
+                elif control_space == "actuator":
+                    self.actuator_control_sub_left = self.create_subscription(
+                        ActuatorControl,
+                        "left/actuator_control",
+                        self.actuator_control_left_callback,
+                        10,
+                    )
+                else:
+                    self.get_logger().error(f"Invalid control space: {control_space}")
+                    raise ValueError(
+                        f'Invalid control space: {control_space}, expected "joint" or "actuator"'
+                    )
 
-        ## Atleast one hand should be initialized
-        if right_port == "" and left_port == "":
+                self.hand_state_pub_left = self.create_publisher(
+                    ActuatorStates, "left/actuator_states", 10
+                )
+
+        ## At least one hand should be configured
+        if right_port in ("", "none") and left_port in ("", "none"):
             self.get_logger().error(
-                "Both right_port and left_port are None. Please provide at least one port."
+                "Both right_port and left_port are disabled. Please provide at least one port."
             )
             raise ValueError(
-                "Both right_port and left_port are None. Please provide at least one port."
+                "Both right_port and left_port are disabled. Please provide at least one port."
+            )
+
+        ## Error if no hands were successfully initialized
+        if not hasattr(self, "right_hand") and not hasattr(self, "left_hand"):
+            self.get_logger().error(
+                "No hands were successfully initialized. "
+                "Please check your connections and port configuration."
+            )
+            raise RuntimeError(
+                "No hands were successfully initialized. "
+                "Please check your connections and port configuration."
             )
 
         ## Joint Limits

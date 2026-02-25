@@ -250,8 +250,8 @@ class DexRetargetingNode(Node):
         joint_values = self.apply_scale_factors(joint_values)
         joint_values = np.clip(
             joint_values,
-            AeroHandConstants.joint_lower_limits,
-            AeroHandConstants.joint_upper_limits,
+            np.deg2rad(AeroHandConstants.joint_lower_limits),
+            np.deg2rad(AeroHandConstants.joint_upper_limits),
         ).tolist()
         self.publish_joint_controls(joint_values, hand_side)
 

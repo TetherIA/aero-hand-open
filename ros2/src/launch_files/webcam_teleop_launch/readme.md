@@ -26,8 +26,8 @@ ros2 launch src/launch_files/webcam_teleop_launch/webcam_teleop.launch.py
 ### Common overrides (recommended)
 
 ```bash
-# Set right hand port explicitly (and disable left hand)
-ros2 launch src/launch_files/webcam_teleop_launch/webcam_teleop.launch.py right_hand_port:=/dev/ttyUSB0 left_hand_port:=""
+# Set left hand port explicitly (and disable right hand)
+ros2 launch src/launch_files/webcam_teleop_launch/webcam_teleop.launch.py right_hand_port:=none left_hand_port:=auto
 
 # Tune hand connection settings
 ros2 launch src/launch_files/webcam_teleop_launch/webcam_teleop.launch.py baudrate:=921600 feedback_frequency:=100.0

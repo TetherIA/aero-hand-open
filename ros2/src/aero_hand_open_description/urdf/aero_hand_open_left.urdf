@@ -48,7 +48,7 @@
     <origin xyz="-0.028112 -0.0145 0.025363" rpy="-1.2217 0 1.57" />
     <parent link="left_base_link" />
     <child link="left_t_link" />
-    <axis xyz="0 1 0" />
+    <axis xyz="0 -1 0" />
     <limit lower="0" upper="1.7453" effort="0" velocity="0" />
   </joint>
   <link name="left_thumb_mcp_link">
@@ -77,7 +77,7 @@
     <origin xyz="0.003475 0.003808 0.019656" rpy="0.1325 0.17906 -0.26195" />
     <parent link="left_t_link" />
     <child link="left_thumb_mcp_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="0.9599" effort="0" velocity="0" />
   </joint>
   <link name="left_thumb_proximal_link">
@@ -106,7 +106,7 @@
     <origin xyz="0 0.0033822 0.035848" rpy="0 0 0" />
     <parent link="left_thumb_mcp_link" />
     <child link="left_thumb_proximal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_thumb_distal_link">
@@ -135,7 +135,7 @@
     <origin xyz="0 0.002206 0.029919" rpy="0 0 0" />
     <parent link="left_thumb_proximal_link" />
     <child link="left_thumb_distal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_thumb_tip_link">
@@ -192,7 +192,7 @@
     <origin xyz="-0.030626 -0.0011782 0.10542" rpy="0 -0.05236 0.034907" />
     <parent link="left_base_link" />
     <child link="left_index_proximal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_index_middle_link">
@@ -221,7 +221,7 @@
     <origin xyz="0 -0.0014554 0.043" rpy="0 0 0" />
     <parent link="left_index_proximal_link" />
     <child link="left_index_middle_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_index_distal_link">
@@ -250,7 +250,7 @@
     <origin xyz="0 0 0.022" rpy="0 0 0" />
     <parent link="left_index_middle_link" />
     <child link="left_index_distal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_index_tip_link">
@@ -307,7 +307,7 @@
     <origin xyz="-0.0075 0 0.106" rpy="0 0 0" />
     <parent link="left_base_link" />
     <child link="left_middle_proximal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_middle_middle_link">
@@ -336,7 +336,7 @@
     <origin xyz="0 -0.0014554 0.043" rpy="0 0 0" />
     <parent link="left_middle_proximal_link" />
     <child link="left_middle_middle_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_middle_distal_link">
@@ -365,7 +365,7 @@
     <origin xyz="0 0 0.022" rpy="0 0 0" />
     <parent link="left_middle_middle_link" />
     <child link="left_middle_distal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_middle_tip_link">
@@ -422,7 +422,7 @@
     <origin xyz="0.015626 -0.0011782 0.10542" rpy="0 0.05236 -0.034907" />
     <parent link="left_base_link" />
     <child link="left_ring_proximal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_ring_middle_link">
@@ -451,7 +451,7 @@
     <origin xyz="0 -0.0014554 0.043" rpy="0 0 0" />
     <parent link="left_ring_proximal_link" />
     <child link="left_ring_middle_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_ring_distal_link">
@@ -480,7 +480,7 @@
     <origin xyz="0 0 0.022" rpy="0 0 0" />
     <parent link="left_ring_middle_link" />
     <child link="left_ring_distal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_ring_tip_link">
@@ -537,7 +537,7 @@
     <origin xyz="0.038266 -0.0036416 0.092393" rpy="0 0.10472 -0.069946" />
     <parent link="left_base_link" />
     <child link="left_pinky_proximal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_pinky_middle_link">
@@ -566,7 +566,7 @@
     <origin xyz="0 -0.0014554 0.043" rpy="0 0 0" />
     <parent link="left_pinky_proximal_link" />
     <child link="left_pinky_middle_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_pinky_distal_link">
@@ -595,7 +595,7 @@
     <origin xyz="0 0 0.022" rpy="0 0 0" />
     <parent link="left_pinky_middle_link" />
     <child link="left_pinky_distal_link" />
-    <axis xyz="-1 0 0" />
+    <axis xyz="1 0 0" />
     <limit lower="0" upper="1.5708" effort="0" velocity="0" />
   </joint>
   <link name="left_pinky_tip_link">

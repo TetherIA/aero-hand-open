@@ -8,9 +8,9 @@ This guide describes how to **deploy a trained Z-rotation policy** using reinfor
 
 The following repositories are required:
 
-1. **[Aero-Hand-Open SDK](https://github.com/TetherIA/aero-hand-open/tree/main/sdk)**
+1. **[Aero-Hand-Open SDK](https://github.com/TetherIA/aero-open-sdk)**
 2. **[Aero-Open-Firmware](https://github.com/TetherIA/aero-open-firmware)**
-3. **[MuJoCo Playground (fork)](https://github.com/TetherIA/mujoco_playground_pr)**
+3. **[MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground)**
 
 ---
 
@@ -63,11 +63,11 @@ git checkout 46bc858cf07f8c8858887ff11c5362b4078bc869
 Clone from our maintained fork:
 
 ```bash
-git clone git@github.com:TetherIA/mujoco_playground_pr.git
-cd mujoco_playground_pr
+git clone git@github.com:google-deepmind/mujoco_playground.git
+cd mujoco_playground
 ```
 
-Then follow the [installation guide](https://github.com/TetherIA/mujoco_playground_pr?tab=readme-ov-file#from-source).
+Then follow the [installation guide](https://github.com/google-deepmind/mujoco_playground?tab=readme-ov-file#from-source).
 
 ---
 

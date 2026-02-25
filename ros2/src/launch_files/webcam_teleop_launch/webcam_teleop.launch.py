@@ -27,7 +27,7 @@ def generate_launch_description():
     ## Example port: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A9J6J4J3-if00-port0
     # Defaults (can be overridden from CLI via launch arguments, e.g. `right_hand_port:=...`)
     default_right_hand_port = "auto"  # auto detect port
-    default_left_hand_port = ""  # no port specified will not initialize the left hand
+    default_left_hand_port = ""  # empty string or "none" mean no port specified, will not initialize the left hand
     default_baudrate = "921600"
     default_feedback_frequency = "100.0"  # Hz
 
@@ -79,7 +79,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "left_hand_port",
                 default_value=default_left_hand_port,
-                description="Serial port for left hand (empty string disables left hand).",
+                description="Serial port for left hand ('none' disables left hand).",
             ),
             DeclareLaunchArgument(
                 "baudrate",
