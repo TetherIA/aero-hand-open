@@ -32,9 +32,28 @@ void resetSdToBaseline() {
 static volatile bool s_busy = false;
 bool HOMING_isBusy() { return s_busy; }
 
-// ----------------------- Buffer Position Degrees -----------------------
-static const float BUF_DEG = 10.0f;
-static const uint16_t BUF_CNT =(uint16_t) ((BUF_DEG/360.0f) *4095.0f);
+// ----------------------- Open Offset Position Degrees -----------------------
+static const float OPEN_OFFSET_10_DEG = 10.0f;   
+static const int32_t OPEN_OFFSET_10_CNT =(int32_t)((OPEN_OFFSET_10_DEG / 360.0f) * 4095.0f);
+
+static inline uint16_t addoffset(int32_t open, int32_t close, int32_t delta) {
+  int32_t result;
+  if (delta >= 0) {
+    if (close > open)
+      result = open + delta;
+    else
+      result = open - delta;
+  } else {
+    int32_t absDelta = -delta;
+    if (close > open)
+      result = open - absDelta;
+    else
+      result = open + absDelta;
+  }
+  if (result < 0) result = 0;
+  if (result > 4095) result = 4095;
+  return (uint16_t)result;
+}
 
 // -------Servo Presence + Current Limit Check (Post Homing) -------
 static void enforceServoCurrentLimitPostHoming() {
@@ -95,10 +114,14 @@ static void zero_with_current(uint8_t index, int direction, int current_limit) {
 
   if (servoID == 0) {
     // Thumb abduction: hold grasp posture for a moment
+    sd[0].extend_count = addoffset(sd[0].extend_count, sd[0].grasp_count, OPEN_OFFSET_10_CNT);
+    sd[0].grasp_count  = addoffset(sd[0].grasp_count, sd[0].extend_count, -OPEN_OFFSET_10_CNT);
     hlscl.WritePosEx(servoID, sd[index].grasp_count, 2400, 0, 1000);
     delay(250);
   } else if (servoID == 1) {
     // Thumb flexion: go to extend
+    sd[1].extend_count = addoffset(sd[1].extend_count, sd[1].grasp_count, -OPEN_OFFSET_10_CNT);
+    sd[1].grasp_count  = addoffset(sd[1].grasp_count, sd[1].extend_count, OPEN_OFFSET_10_CNT);
     hlscl.WritePosEx(servoID, sd[index].extend_count, 2400, 0, 1000);
     delay(250);
   } else if (servoID == 2) {
