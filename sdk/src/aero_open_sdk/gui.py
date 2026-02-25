@@ -77,6 +77,9 @@ class App(tk.Tk):
         self.minsize(860, 560)
         if sys.platform.startswith("win"):
             self.state("zoomed")
+        elif sys.platform == "darwin":
+            self.update_idletasks()
+            self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}+0+0")
         else:
             self.attributes("-zoomed", True)
 
