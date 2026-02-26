@@ -7,6 +7,9 @@
 - Default torque value for motors, when intilizing the Aero Hand Node is now set to 700.
 - Bug fix in port declaration that prevented the port initialization from command line.
 
+### Firmware 0.2.0 release
+- Apply 10 degrees offset for thumb cmd abd and thumb cmd flex joints during homing. This change improves the linearity of the joint position control and avoid motor stall around joint limits, but it also breaks the backward compatibity.
+
 ## 2026-02-12
 
 ### Firmware v0.1.5
