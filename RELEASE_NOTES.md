@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2026-02-25
+
+### ROS2 Release
+- Fixed the left hand URDF model to correctly move the joints.
+- Default torque value for motors, when intilizing the Aero Hand Node is now set to 700.
+- Bug fix in port declaration that prevented the port initialization from command line.
+
 ## 2026-02-12
 
 ### Firmware v0.1.5
