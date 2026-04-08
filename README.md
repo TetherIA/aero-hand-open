@@ -83,7 +83,7 @@ STEP files and one click print files can be found here:
 
 [👉 Aero Hand Open – CAD](./hardware/CAD/).
 
-[👉 Aero Hand Open – Onshape Link](https://cad.onshape.com/documents/afc7e0ca7eb6d412ec8771f8/w/bc4d7e45e17e23d622d2bad2/e/c711982b7882da925263fb55?renderMode=0&uiState=6914cef580110c73012e8166)
+[👉 Aero Hand Open – Onshape Link](https://cad.onshape.com/documents/afc7e0ca7eb6d412ec8771f8/w/bc4d7e45e17e23d622d2bad2/e/c711982b7882da925263fb55?renderMode=0&uiState=69d6d9eafca41cd78ff4328c)
 
 All parts are printed on a Bambu X1C, 0.4mm nozzle, 0.2mm layer height, tree support enabled, select support on build plate only checkbox. We recommend keeping the same print orientation and settings. The print orientation will minimize supports and optimize surface tolerances/smoothness for interfacing components.
 
