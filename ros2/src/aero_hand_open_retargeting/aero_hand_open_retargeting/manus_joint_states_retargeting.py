@@ -99,6 +99,25 @@ class ManusJointStatesRetargeting(Node):
             jv for idx, jv in enumerate(joint_values) if idx not in abduction_indices
         ]
 
+        ## Scale Values as per the Human Hand.
+        THUMB_ABD_S = 1.2
+        THUMB_FLEX_S = 1.2
+        THUMB_MCP_IP_S = 1.3
+        INDEX_S = 1.3
+        MIDDLE_S = 1.3
+        RING_S = 1.3
+        PINKY_S = 1.3
+
+        joint_values = np.array(joint_values)
+        joint_values[0] = joint_values[0] * THUMB_ABD_S
+        joint_values[1] = joint_values[1] * THUMB_FLEX_S
+        joint_values[2] = joint_values[2] * THUMB_MCP_IP_S
+        joint_values[3] = joint_values[3] * THUMB_MCP_IP_S
+        joint_values[4:7] = joint_values[4:7] * INDEX_S
+        joint_values[7:10] = joint_values[7:10] * MIDDLE_S
+        joint_values[10:13] = joint_values[10:13] * RING_S
+        joint_values[13:16] = joint_values[13:16] * PINKY_S
+
         ## Clamp the joint values to the limits
         joint_values = np.clip(
             joint_values, self.joint_ll_rad, self.joint_ul_rad
