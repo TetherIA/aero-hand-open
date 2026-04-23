@@ -36,6 +36,7 @@ import time
 import subprocess
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog, filedialog
+from typing import List, Optional
 
 from serial.tools import list_ports
 
@@ -91,12 +92,12 @@ class App(tk.Tk):
             print(f"Could not set window icon: {e}")
 
         # runtime state
-        self.hand: AeroHand | None = None
-        self.tx_thread: threading.Thread | None = None
+        self.hand: Optional[AeroHand] = None
+        self.tx_thread: Optional[threading.Thread] = None
         self.stop_event = threading.Event()
         self.control_paused = False  # pause streaming during blocking ops
         self.tx_rate_hz = 50.0       # streaming rate for CTRL_POS
-        self.slider_vars: list[tk.DoubleVar] = []  # Use DoubleVar for normalized 0.0-1.0 range
+        self.slider_vars: List[tk.DoubleVar] = []  # Use DoubleVar for normalized 0.0-1.0 range
         self.port_var = tk.StringVar()
         self.baud_var = tk.IntVar(value=921600)
 
@@ -126,7 +127,7 @@ class App(tk.Tk):
         self.btn_connect.pack(side=tk.LEFT, padx=(0, 8))
         self.btn_disc = ttk.Button(top, text="Disconnect", command=self.on_disconnect, state=tk.DISABLED)
         self.btn_disc.pack(side=tk.LEFT, padx=(0, 16))
-        
+
         # Streaming rate
         ttk.Label(top, text="Rate (Hz):").pack(side=tk.LEFT)
         self.rate_spin = ttk.Spinbox(top, from_=1, to=200, width=6)
@@ -563,7 +564,7 @@ class App(tk.Tk):
             self.log(f"[GET_TEMP] {list(vals)}")
         except Exception as e:
             self.log(f"[err] GET_TEMP: {e}")
-    
+
     def on_get_all(self):
         if not self.hand:
             return
@@ -619,13 +620,13 @@ class App(tk.Tk):
 
             max_attempts = 3
             for attempt in range(1, max_attempts + 1):
-                time.sleep(1.5) 
+                time.sleep(1.5)
                 self.log(f"[flash] Reconnect attempt {attempt}...")
                 result = {'ok': False}
                 done = threading.Event()
                 def _do_connect():
                     try:
-                        ok = bool(self.on_connect()) 
+                        ok = bool(self.on_connect())
                         result['ok'] = ok
                     except Exception as e:
                         self.log(f"[flash] on_connect raised: {e}")
@@ -633,25 +634,26 @@ class App(tk.Tk):
                     finally:
                         done.set()
                 self.after(0, _do_connect)
-                if not done.wait(3.0): 
+                if not done.wait(3.0):
                     self.log("[flash] connect timed out")
-                    continue                   
+                    continue
                 if result['ok']:
                     self.log("[flash] Reconnected ✅")
-                    break                     
+                    break
             else:
                 self.after(0, lambda: self.set_status("Reconnect failed after flashing"))
                 self.after(0, lambda: messagebox.showerror("Flash failed", "Reconnect failed after flashing"))
 
         threading.Thread(target=worker, daemon=True).start()
 
-    # ---- to clear RX window 
+    # ---- to clear RX window
     def _clear_rx(self):
         """Clear the RX log text box."""
         try:
             self.rx_text.delete("1.0", tk.END)
         except Exception:
             pass
+
     # ---- teardown ----
     def _on_close(self):
         try:

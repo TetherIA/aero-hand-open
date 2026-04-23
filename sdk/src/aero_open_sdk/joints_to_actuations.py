@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import List, Tuple
 
 MOTOR_PULLEY_RADIUS = 9.000 # mm
 
@@ -60,7 +61,7 @@ class JointsToActuationsModel:
 
     def thumb_actuations(
         self, cmc_abd: float, cmc_flex: float, mcp: float, ip: float
-    ) -> tuple[float, float, float]:
+    ) -> Tuple[float, float, float]:
         ## Thumb CMC abduction and flexion are linear mappings.
         thumb_cmc_abd_actuation = cmc_abd
 
@@ -82,7 +83,7 @@ class JointsToActuationsModel:
 
         return thumb_cmc_abd_actuation, thumb_cmc_flex_actuation, thumb_tendon_actuation
 
-    def hand_actuations(self, joint_positions: list[float]) -> list[float]:
+    def hand_actuations(self, joint_positions: List[float]) -> List[float]:
         """
         Convert joint positions to actuator movements.
         Args:

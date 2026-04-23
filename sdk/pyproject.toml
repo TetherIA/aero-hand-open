@@ -3,7 +3,7 @@ name = "aero-open-sdk"
 version = "0.1.0.dev1"
 description = "This package provides an interface to control the Aero Hand Open robotic hand."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 authors = [
     { name = "Mohit Yadav", email = "mohityadav@tetheria.ai" },
 ]
@@ -13,7 +13,7 @@ maintainers = [
 license = { text = "Apache License 2.0" }
 
 dependencies = [
-    "esptool>=5.0.0",
+    "esptool>=4.5,<5",
 ]
 
 [project.urls]

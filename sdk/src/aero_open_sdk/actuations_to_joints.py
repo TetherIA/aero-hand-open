@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from typing import List, Tuple
+
 from aero_open_sdk.joints_to_actuations import (
     MOTOR_PULLEY_RADIUS,
     FingerCoeffs,
@@ -49,7 +51,7 @@ class ActuationsToJointsModelCompact:
 
     def thumb_joints(
         self, cmc_abd_act: float, cmc_flex_act: float, thumb_tendon_act: float
-    ) -> tuple[float, float, float]:
+    ) -> Tuple[float, float, float]:
         """
         Convert thumb actuator movements to joint angles.
         Args:
@@ -77,7 +79,7 @@ class ActuationsToJointsModelCompact:
         ) / (self.thumb_ip_coeffs.mcp_coeff + self.thumb_ip_coeffs.ip_coeff)
         return cmc_abd_joint, cmc_flex_joint, mcp_ip_joint
 
-    def hand_joints(self, actuations: list[float]) -> list[float]:
+    def hand_joints(self, actuations: List[float]) -> List[float]:
         """
         Convert actuator movements to joint positions.
         Args:

@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Tuple
+
 
 @dataclass(frozen=True)
 class AeroHandConstants:
     ## Joints (16)
-    joint_names: tuple[str, ...] = (
+    joint_names: Tuple[str, ...] = (
         "thumb_cmc_abd", "thumb_cmc_flex", "thumb_mcp", "thumb_ip", ## 4 Joints in thumb
         "index_mcp_flex", "index_pip", "index_dip",               ## 3 Joints in index
         "middle_mcp_flex", "middle_pip", "middle_dip",            ## 3 Joints in middle
@@ -25,14 +27,14 @@ class AeroHandConstants:
         "pinky_mcp_flex", "pinky_pip", "pinky_dip"                ## 3 Joints in pinky
     )
 
-    joint_lower_limits: tuple[float, ...] = (
+    joint_lower_limits: Tuple[float, ...] = (
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0
     )
-    joint_upper_limits: tuple[float, ...] = (
+    joint_upper_limits: Tuple[float, ...] = (
         100.0, 55.0, 90.0, 90.0,
         90.0, 90.0, 90.0,
         90.0, 90.0, 90.0,
@@ -41,14 +43,14 @@ class AeroHandConstants:
     )
 
     ## Actuations (7)
-    actuation_names: tuple[str, ...] = (
+    actuation_names: Tuple[str, ...] = (
         "thumb_cmc_abd_act", "thumb_cmc_flex_act", "thumb_tendon_act",      ## 3 Actuators in thumb
         "index_tendon_act", "middle_tendon_act", "ring_tendon_act", "pinky_tendon_act" ## One actuator per finger
     )
 
-    actuation_lower_limits: tuple[float, ...] = (
+    actuation_lower_limits: Tuple[float, ...] = (
         0.0, 0.0, -15.2789, 0.0, 0.0, 0.0, 0.0
     )
-    actuation_upper_limits: tuple[float, ...] = (
+    actuation_upper_limits: Tuple[float, ...] = (
         100.0, 104.1250, 247.1500, 288.1603, 288.1603, 288.1603, 288.1603
     )
