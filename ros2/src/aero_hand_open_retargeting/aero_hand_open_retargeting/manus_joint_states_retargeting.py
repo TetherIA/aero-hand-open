@@ -47,7 +47,8 @@ class ManusJointStatesRetargeting(Node):
         self.joint_ll_rad = np.deg2rad(AeroHandConstants.joint_lower_limits)
         self.joint_ul_rad = np.deg2rad(AeroHandConstants.joint_upper_limits)
 
-        self.normalize_config = load_normalize_config("default_user")
+        self.use_normalization = True
+        self.normalize_config = load_normalize_config("mohit")
 
         self.get_logger().info("Manus Joint States Retargeting Node has been started.")
 
@@ -104,11 +105,12 @@ class ManusJointStatesRetargeting(Node):
             joint_values, self.joint_ll_rad, self.joint_ul_rad
         ).tolist()
 
-        ## Normalizing thumb joints to account for morphological differences between human hand and robot hand
-        for i in range(joint_values.shape[0]):
-            joint_values[i] = normalize_joint_state(
-                joint_values[i], i, self.normalize_config
-            )
+        ## Normalizing joints to account for morphological differences between human hand and robot hand
+        if self.use_normalization:
+            for i in range(len(joint_values)):
+                joint_values[i] = normalize_joint_state(
+                    joint_values[i], i, self.normalize_config
+                )
 
         self.publish_joint_states(msg.side, joint_values)
 

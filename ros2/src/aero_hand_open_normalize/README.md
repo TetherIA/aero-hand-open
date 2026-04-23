@@ -15,13 +15,10 @@ Run the teleoperation pipeline(without normalization*):
 ```bash
 ros2 run manus_ros2 manus_data_publisher
 ```
-We need to run the `manus_joint_states_retargeting` node without normalization. To do this, we can comment out the normalization code in the `manus_joint_states_retargeting.py` file. Concretely, comment out lines 108-111:
-```python
-# for i in range(joint_values.shape[0]):
-#     joint_values[i] = normalize_joint_state(
-#         joint_values[i], i, self.normalize_config
-#     )
-```
+We need to run the `manus_joint_states_retargeting` node without normalization. To do this, we can toggle the `use_normalization` flag in the `manus_joint_states_retargeting.py` file. Concretely, set `self.use_normalization = False`.
+
+**NOTE:** If you didn't build the pkg with '--symlink-install', you will need to rebuild the pkg after commenting out the normalization code. And source the workspace again.
+
 Now we run the `manus_joint_states_retargeting` node:
 ```bash
 ros2 run aero_hand_open_retargeting manus_joint_states_retargeting
@@ -53,12 +50,7 @@ python3 find_peaks_and_valleys_joint.py \
 
 ### Step 3: Apply Normalization
 
-Use the generated config file in your retargeting pipeline. See `aero_hand_open_retargeting/manus_joint_states_retargeting.py` for an example implementation(Line: 50) `self.normalize_config = load_normalize_config("joe")`. Update the <user> with your name. And decomment the normalization code in the `manus_joint_states_retargeting.py` file. Concretely, uncomment lines 108-111:
-```python
-for i in range(joint_values.shape[0]):
-    joint_values[i] = normalize_joint_state(
-        joint_values[i], i, self.normalize_config
-    )
+Use the generated config file in your retargeting pipeline. See `aero_hand_open_retargeting/manus_joint_states_retargeting.py` for an example implementation(Line: 50) `self.normalize_config = load_normalize_config("joe")`. Update the <user> with your name. And toggle the `use_normalization` flag in the `manus_joint_states_retargeting.py` file. Concretely, set `self.use_normalization = True`.
 ```
 
 ### Step 4: Fine-Tune (Optional)
