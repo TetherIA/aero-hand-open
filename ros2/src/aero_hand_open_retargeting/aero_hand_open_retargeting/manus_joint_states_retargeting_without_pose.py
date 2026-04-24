@@ -59,12 +59,11 @@ class ManusJointStatesRetargeting(Node):
         self.joint_ul_rad = np.deg2rad(AeroHandConstants.joint_upper_limits)
 
         self.use_normalization = True
-        self.normalize_config = load_normalize_config("mohit")
+        self.normalize_config = load_normalize_config("default_user")
 
         self.get_logger().info("Manus Joint States Retargeting Node has been started.")
 
     def glove_callback(self, msg: ManusGlove):
-        # hand_poses = [manus_raw_node.pose for manus_raw_node in msg.raw_nodes]
         joint_values = [np.deg2rad(angle.value) for angle in msg.ergonomics]
 
         ## Convert values to Aero Hand conventions
