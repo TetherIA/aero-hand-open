@@ -71,6 +71,19 @@ Then follow the [installation guide](https://github.com/google-deepmind/mujoco_p
 
 ---
 
+## 🧱 3D-Printed Hardware
+
+Deploying the Z-rotation policy on the **physical** hand requires two 3D-printed parts. The STEP (`.stp`) source files are provided in this package's `resource/` folder:
+
+| File | Description |
+| ---- | ----------- |
+| [`60_60_60_block.stp`](resource/60_60_60_block.stp) | The 60 × 60 × 60 mm cube that the policy is trained to rotate about the Z-axis. |
+| [`mount.stp`](resource/mount.stp) | Mount/fixture used to hold the hand in place during deployment. |
+
+Print both parts before running the deployment steps below.
+
+---
+
 ## 🚀 Run the Deployment
 
 ### 1) Flash the firmware
