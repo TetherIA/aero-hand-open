@@ -77,7 +77,7 @@ Deploying the Z-rotation policy on the **physical** hand requires two 3D-printed
 
 | File | Description |
 | ---- | ----------- |
-| [`60_60_60_block.stp`](resource/60_60_60_block.stp) | The 60 × 60 × 60 mm cube that the policy is trained to rotate about the Z-axis. |
+| [`60_60_60_block.stp`](resource/60_60_60_block.stp) | The 60 × 60 × 60 mm cube that the policy is trained to rotate about the Z-axis. Ideally printed to weigh **117 g** (tune infill/material so the printed cube matches this target mass). |
 | [`mount.stp`](resource/mount.stp) | Mount/fixture used to hold the hand in place during deployment. |
 
 Print both parts before running the deployment steps below.
