@@ -44,8 +44,9 @@ from aero_open_sdk.aero_hand import AeroHand
 
 # ---- operation codes ------------
 HOMING_MODE = 0x01
-SET_ID_MODE = 0x03
-TRIM_MODE   = 0x04
+SET_ID_MODE = 0x02
+TRIM_MODE = 0x03
+CALIBRATE_MID_MODE = 0x04
 
 CTRL_POS = 0x11
 
@@ -167,12 +168,16 @@ class App(tk.Tk):
         self.btn_get_vel  = ttk.Button(cmd, text="GET_VEL",  command=self.on_get_vel,  state=tk.DISABLED)
         self.btn_get_cur  = ttk.Button(cmd, text="GET_CURR", command=self.on_get_cur,  state=tk.DISABLED)
         self.btn_get_temp = ttk.Button(cmd, text="GET_TEMP", command=self.on_get_temp, state=tk.DISABLED)
-        self.btn_get_all  = ttk.Button(cmd, text="GET_ALL",  command=self.on_get_all,  state=tk.DISABLED)
+        self.btn_get_all = ttk.Button(cmd, text="GET_ALL", command=self.on_get_all, state=tk.DISABLED)
+        self.btn_calibrate_mid = ttk.Button(
+            cmd, text="Calibrate Mid", command=self.on_calibrate_mid, state=tk.DISABLED
+        )
         self.btn_get_pos.pack(side=tk.LEFT, padx=(20, 6))
         self.btn_get_vel.pack(side=tk.LEFT, padx=6)
         self.btn_get_cur.pack(side=tk.LEFT, padx=6)
         self.btn_get_temp.pack(side=tk.LEFT, padx=6)
         self.btn_get_all.pack(side=tk.LEFT, padx=6)
+        self.btn_calibrate_mid.pack(side=tk.LEFT, padx=6)
 
         # ---- Sliders (7)
         self.grp = ttk.LabelFrame(self, text="Sliders (send CTRL_POS payload)", padding=10)
@@ -256,6 +261,7 @@ class App(tk.Tk):
         self.set_status("Torque control mode: stopped CTRL_POS streaming")
         for scale in self.slider_widgets:
             scale.configure(state=tk.DISABLED)
+        self.btn_calibrate_mid.configure(state=tk.DISABLED)
         self.grp.configure(text="Sliders (CTRL_POS disabled)")
         # Show torque slider
         self.torque_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=(6, 10))
@@ -277,6 +283,7 @@ class App(tk.Tk):
         self.torque_frame.pack_forget()
         for scale in self.slider_widgets:
             scale.configure(state=tk.NORMAL)
+        self.btn_calibrate_mid.configure(state=tk.NORMAL)
         self.grp.configure(text="Sliders (send CTRL_POS payload)")
 
     # ------------- connect/disconnect -------------
@@ -306,7 +313,7 @@ class App(tk.Tk):
             self.btn_connect.configure(state=tk.DISABLED)
             self.btn_disc.configure(state=tk.NORMAL)
             for b in (self.btn_zero,self.btn_homing, self.btn_setid, self.btn_trim,self.btn_set_speed,self.btn_set_torque,
-                      self.btn_get_pos, self.btn_get_vel, self.btn_get_cur, self.btn_get_temp, self.btn_get_all):
+                      self.btn_get_pos, self.btn_get_vel, self.btn_get_cur, self.btn_get_temp, self.btn_get_all, self.btn_calibrate_mid):
                 b.configure(state=tk.NORMAL)
 
             self.set_status(f"Connected to {port} @ {baud}")
@@ -340,7 +347,7 @@ class App(tk.Tk):
         self.btn_connect.configure(state=tk.NORMAL)
         self.btn_disc.configure(state=tk.DISABLED)
         for b in (self.btn_zero,self.btn_homing, self.btn_setid, self.btn_trim,self.btn_set_speed,self.btn_set_torque,
-                  self.btn_get_pos, self.btn_get_vel, self.btn_get_cur, self.btn_get_temp, self.btn_get_all):
+                  self.btn_get_pos, self.btn_get_vel, self.btn_get_cur, self.btn_get_temp, self.btn_get_all, self.btn_calibrate_mid):
             b.configure(state=tk.DISABLED)
         self.set_status("Disconnected")
         self.log("[info] Disconnected")
@@ -510,12 +517,55 @@ class App(tk.Tk):
                 self.control_paused = True
                 self.set_status("Trimming… waiting for ACK")
                 self.log(f"[TX] TRIM sent (ch={ch}, deg={deg})")
-                ack = self.hand.trim_servo(ch, deg)  # dict with Servo ID, Extend Count
-                self.log(f"[ACK] TRIM: id={ack['Servo ID']} extend={ack['Extend Count']}")
+                ack = self.hand.trim_servo(ch, deg)
+                self.log(
+                    f"[ACK] TRIM: id={ack['Servo ID']} "
+                    f"extend_raw={ack['Extend Raw']} present_raw={ack['Present Raw']}"
+                )
                 self.set_status("Trim complete")
             except Exception as e:
                 self.log(f"[err] TRIM failed: {e}")
                 self.set_status("Trim failed")
+            finally:
+                self.control_paused = False
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def on_calibrate_mid(self):
+        if not self.hand:
+            return
+        ch = simpledialog.askinteger(
+            "Calibrate Mid", "Servo ID / channel (0..6):",
+            minvalue=0, maxvalue=6, parent=self,
+        )
+        if ch is None:
+            return
+        confirmed = messagebox.askyesno(
+            "Calibrate Mid",
+            "The selected actuator's current physical position will become its middle position.\n\n"
+            "The slider will stay unchanged. When position streaming resumes, the actuator may move "
+            "to the same slider target in the new coordinate system.\n\n"
+            "Set low speed and torque before continuing. Proceed?",
+            parent=self,
+        )
+        if not confirmed:
+            return
+
+        def worker():
+            try:
+                self.control_paused = True
+                self.set_status("Calibrating middle position… waiting for ACK")
+                self.log(f"[TX] CALIBRATE_MID sent (ch={ch}, slider={self.slider_vars[ch].get():.3f})")
+                ack = self.hand.calibrate_mid(ch)
+                self.log(
+                    f"[ACK] CALIBRATE_MID: id={ack['Servo ID']} "
+                    f"present_raw={ack['Present Raw']} present_u16={ack['Present U16']} "
+                    f"slider_unchanged={self.slider_vars[ch].get():.3f}"
+                )
+                self.set_status("Middle calibration complete; resuming unchanged slider target")
+            except Exception as e:
+                self.log(f"[err] CALIBRATE_MID failed: {e}")
+                self.set_status("Middle calibration failed")
             finally:
                 self.control_paused = False
 

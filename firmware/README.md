@@ -170,7 +170,7 @@ You can switch hands either by editing `HandConfig.h` **or** using build flags.
 ### Frame Structure (TX and RX)
 | Bytes     | Field            | Description                                                                 |
 |-----------|-----------------|-----------------------------------------------------------------------------|
-| 0         | **Opcode**      | Command / response code (e.g., `0x01` for HOMING, `0x04` for TRIM).         |
+| 0         | **Opcode**      | Command / response code (e.g., `0x01` for HOMING, `0x03` for TRIM).         |
 | 1         | **Filler**      | Always `0x00` (reserved for future use).                                    |
 | 2..15     | **Payload**     | 14-byte payload. May contain parameters (channels, degrees, IDs, etc.) or be all zeros in acknowledgments. |
 
@@ -181,7 +181,8 @@ You can switch hands either by editing `HandConfig.h` **or** using build flags.
 | -----: | ---------- | --------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `0x01` | `HOMING`   | H→D       | 14 × `0x00`                                                                               | `[0x01,0x00, 14×0x00]` when complete                       |
 | `0x02` | `SET_ID`   | H→D       | `new_id(u16)`, `current_limit(u16)`, rest zeros                                           | `[0x02,0x00, oldId(u16), newId(u16), curLim(u16), rest 0]` |
-| `0x03` | `TRIM`     | H→D       | `channel(u16:0..6)`, `degrees(i16: ±360)`, rest zeros                                     | `[0x03,0x00, channel(u16), extendCount(u16), rest 0]`      |
+| `0x03` | `TRIM`     | H→D       | `channel(u16:0..6)`, `degrees(i16: ±360)`, rest zeros                                     | `[0x03,0x00, channel(u16), extendRaw(u16), presentRaw(u16), status(u16), version(u16), rest 0]` |
+| `0x04` | `CALIBRATE_MID` | H→D   | `channel(u16:0..6)`, rest zeros                                                           | `[0x04,0x00, channel(u16), presentRaw(u16), presentU16(u16), status(u16), version(u16), rest 0]` |
 | `0x11` | `CTRL_POS` | H→D       | **7×** `u16` (channels 0..6). Range `0..65535` maps to **extend→grasp** span per channel. | *(none)*                                                   |
 | `0x12` | `CTRL_TOR` | H→D       | Set torque for all servos (7×u16)                                                     | *(none)*                                                   |
 | `0x22` | `GET_POS`  | H↔D       | 14×`0x00`                                                                                 | **7×** `u16` raw positions (counts 0..4095)                |
@@ -217,7 +218,27 @@ Direction is handled via servo_direction. Final writes use bus-batched SyncWrite
 
 **7.4 Persistence, Homing & Timing**
 
-TRIM updates the extend endpoint for one channel and saves it in NVS (persists across reboots).
+TRIM updates the extend endpoint for one channel and saves it in NVS (persists across reboots). Its ACK also reports the saved `extendRaw` and the actuator's current `presentRaw` position.
+
+### 7.4.1 Manual middle calibration
+
+`CALIBRATE_MID` calibrates the selected actuator's current physical position as its middle position. This is useful when tendon length, pretension, or spool winding places the useful finger travel outside the default single-turn window. After middle calibration, use TRIM to align the extend endpoint.
+
+![Calibrate Mid GUI](main/assets/calibrate_mid_gui.png)
+
+A real assembly can have a different tendon/spool winding direction or initial wrap than the default homing assumption:
+
+![Tendon spool direction example](main/assets/calibrate_mid_spool_direction.jpg)
+
+Safe procedure:
+
+1. Set a low speed and torque limit for the selected channel.
+2. Use the slider to place the actuator at the desired physical reference position.
+3. Press **Calibrate Mid**, select the channel, and confirm the warning.
+4. Check that the returned `presentRaw` is near the actuator midpoint (approximately 2048).
+5. Use **Trim Servo** to adjust the extend endpoint; its ACK prints both `extendRaw` and `presentRaw`.
+
+The slider remains unchanged during calibration. When position streaming resumes, the actuator may move because the same slider target is interpreted in the new coordinate system. Running HOMING later recalibrates the actuator offset again and can replace this manual middle calibration.
 
 HOMING:
 
@@ -249,7 +270,7 @@ RX: 02 00 oldId_lo oldId_hi 03 00 FF 03 00 00 00 00 00 00 00 00
 Trim channel 3 by −100° (0xFF9C):
 ```Payload
 TX: 03 00 03 00 9C FF 00 00 00 00 00 00 00 00 00 00
-RX: 03 00 03 00 ext_lo ext_hi 00 00 00 00 00 00 00 00 00 00
+RX: 03 00 03 00 ext_lo ext_hi pos_lo pos_hi 00 00 01 00 00 00 00 00
 ```
 
 CTRL_POS (7 channels). Example: all open (0):

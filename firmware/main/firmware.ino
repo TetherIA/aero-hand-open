@@ -20,11 +20,14 @@ const uint8_t SERVO_IDS[7] = { 0, 1, 2, 3, 4, 5, 6 };
 
 ServoData sd[7];
 
+static inline void sendAckFrame(uint8_t header, const uint8_t* payload, size_t n);
+
 // ---- Constants for Control Code byte ----
-static const uint8_t HOMING    = 0x01;
-static const uint8_t SET_ID    = 0x02;
-static const uint8_t TRIM      = 0x03;
-static const uint8_t CTRL_POS  = 0x11;
+static const uint8_t HOMING        = 0x01;
+static const uint8_t SET_ID         = 0x02;
+static const uint8_t TRIM           = 0x03;
+static const uint8_t CALIBRATE_MID  = 0x04;
+static const uint8_t CTRL_POS       = 0x11;
 static const uint8_t CTRL_TOR  = 0x12;
 static const uint8_t GET_POS   = 0x22;
 static const uint8_t GET_VEL   = 0x23;
@@ -407,15 +410,55 @@ static bool handleTrimCmd(const uint8_t* payload) {
   prefs.begin("hand", false);
   prefs.putInt(String("ext" + String(ch)).c_str(), sd[ch].extend_count);
   prefs.end();
-  // ACK payload: ch (u16, LE), extend_count (u16, LE)
-  uint8_t ack[4];
-  ack[0] = (uint8_t)(ch & 0xFF);
-  ack[1] = (uint8_t)((ch >> 8) & 0xFF);
-  ack[2] = (uint8_t)(sd[ch].extend_count & 0xFF);
-  ack[3] = (uint8_t)((sd[ch].extend_count >> 8) & 0xFF);
-  sendAckFrame(TRIM, ack, sizeof(ack));   // 16 bytes on the wire
+  int present = -1;
+  if (gBusMux) xSemaphoreTake(gBusMux, portMAX_DELAY);
+  present = hlscl.ReadPos(SERVO_IDS[ch]);
+  if (gBusMux) xSemaphoreGive(gBusMux);
+
+  uint16_t present_raw = present < 0 ? 0xFFFF : (uint16_t)(((present % 4096) + 4096) % 4096);
+  uint16_t ack_values[7] = {
+      (uint16_t)ch, sd[ch].extend_count, present_raw, 0, 1, 0, 0};
+  sendU16Frame(TRIM, ack_values);
   return true;
 }
+
+static bool handleCalibrateMidCmd(const uint8_t* payload) {
+  uint16_t rawCh = leu_u16(payload);
+  uint16_t present_raw = 0xFFFF;
+  uint16_t present_u16 = 0;
+  uint16_t status = 1;
+
+  if (rawCh < 7 && g_currentMode == MODE_POS) {
+    uint8_t ch = (uint8_t)rawCh;
+    uint8_t servoID = SERVO_IDS[ch];
+    int present = -1;
+
+    if (gBusMux) xSemaphoreTake(gBusMux, portMAX_DELAY);
+    bool calibrated = hlscl.CalibrationOfs(servoID) != 0;
+    delay(30);
+    if (calibrated) present = hlscl.ReadPos(servoID);
+    bool mode_set = hlscl.ServoMode(servoID) != 0;
+    bool locked = hlscl.LockEprom(servoID) != 0;
+    bool position_set = false;
+    if (present >= 0 && mode_set && locked) {
+      position_set = hlscl.WritePosEx(
+          servoID, present, g_speed[ch], g_accel[ch], g_torque[ch]) != 0;
+    }
+    bool torque_enabled = hlscl.EnableTorque(servoID, 1) != 0;
+    if (gBusMux) xSemaphoreGive(gBusMux);
+
+    if (calibrated && present >= 0 && mode_set && locked && position_set && torque_enabled) {
+      present_raw = (uint16_t)(((present % 4096) + 4096) % 4096);
+      present_u16 = mapRawToU16(ch, present_raw);
+      if (present_raw >= 2000 && present_raw <= 2096) status = 0;
+    }
+  }
+
+  uint16_t ack_values[7] = {rawCh, present_raw, present_u16, status, 1, 0, 0};
+  sendU16Frame(CALIBRATE_MID, ack_values);
+  return true;
+}
+
 static bool handleSetSpeedCmd(const uint8_t* payload)
 {
   uint16_t rawId = (uint16_t)payload[0] | ((uint16_t)payload[1] << 8);
@@ -561,6 +604,10 @@ static bool handleHostFrame(uint8_t op) {
 
     case TRIM: {
       return handleTrimCmd(payload);
+    }
+
+    case CALIBRATE_MID: {
+      return handleCalibrateMidCmd(payload);
     }
 
     case GET_POS: {
