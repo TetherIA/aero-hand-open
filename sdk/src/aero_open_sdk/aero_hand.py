@@ -14,8 +14,9 @@
 # limitations under the License.
 
 import os
-import time 
+import time
 import struct
+import threading
 from serial import Serial, SerialTimeoutException
 from typing import Iterator
 
@@ -27,6 +28,7 @@ from aero_open_sdk.actuations_to_joints import ActuationsToJointsModelCompact
 HOMING_MODE = 0x01
 SET_ID_MODE = 0x02
 TRIM_MODE = 0x03
+CALIBRATE_MID_MODE = 0x04
 
 ## Command Modes
 CTRL_POS = 0x11
@@ -55,6 +57,7 @@ class AeroHand:
             print("No port specified. Attempting to auto-detect Aero Hand serial port...")
             port = self._detect_port()
         self.ser = Serial(port, baudrate, timeout=0.01, write_timeout=0.01)
+        self._serial_lock = threading.RLock()
 
         ## Clean Buffers before starting
         self.ser.reset_input_buffer()
@@ -315,12 +318,53 @@ class AeroHand:
 
         payload = [0] * 7
         payload[0] = id & 0xFFFF
-        payload[1] = degrees & 0xFFFF  
-        self._send_data(TRIM_MODE, payload)
-        payload = self._wait_for_ack(TRIM_MODE, 2.0)
-        id, extend = struct.unpack_from("<HH", payload, 0)
-        return {"Servo ID": id, "Extend Count": extend}
-    
+        payload[1] = degrees & 0xFFFF
+        with self._serial_lock:
+            self._send_data(TRIM_MODE, payload)
+            payload = self._wait_for_ack(TRIM_MODE, 2.0)
+        id, extend_raw, present_raw, status, protocol_version = struct.unpack_from(
+            "<HHHHH", payload, 0
+        )
+        if status != 0:
+            raise RuntimeError("Trim failed to save the extend endpoint")
+        if protocol_version != 1:
+            present_raw = 0xFFFF
+        return {
+            "Servo ID": id,
+            "Extend Count": extend_raw,
+            "Extend Raw": extend_raw,
+            "Present Raw": None if present_raw == 0xFFFF else present_raw,
+        }
+
+    def calibrate_mid(self, id: int):
+        """Calibrate the selected actuator's current position as its middle position."""
+        if not (0 <= id <= 6):
+            raise ValueError("id must be 0..6")
+
+        payload = [0] * 7
+        payload[0] = id
+        with self._serial_lock:
+            try:
+                self.ser.reset_input_buffer()
+            except Exception:
+                pass
+            self._send_data(CALIBRATE_MID_MODE, payload)
+            payload = self._wait_for_ack(CALIBRATE_MID_MODE, 2.0)
+        servo_id, present_raw, present_u16, status, protocol_version = struct.unpack_from(
+            "<HHHHH", payload, 0
+        )
+        if protocol_version != 1:
+            raise RuntimeError("Calibrate Mid requires firmware protocol version 1")
+        if status != 0 or servo_id == 0xFFFF or present_raw == 0xFFFF:
+            raise RuntimeError(
+                "Calibrate Mid failed; verify position mode and the actuator connection"
+            )
+        return {
+            "Servo ID": servo_id,
+            "Present Raw": present_raw,
+            "Present U16": present_u16,
+        }
+
     def ctrl_torque(self, torque: list[int]):
         """
         Set the same torque value for all 7 servos using the CTRL_TOR command.
@@ -337,8 +381,9 @@ class AeroHand:
         assert len(payload) == 7, "Payload must be a list of 7 integers in Range 0-65535"
         assert all(0 <= v <= 65535 for v in payload), "Payload values must be in Range 0-65535"
         msg = struct.pack("<2B7H", header & 0xFF, 0x00, *(v & 0xFFFF for v in payload))
-        self.ser.write(msg)
-        self.ser.flush()
+        with self._serial_lock:
+            self.ser.write(msg)
+            self.ser.flush()
 
     def send_homing(self, timeout_s: float = 175.0):
         try:
