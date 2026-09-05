@@ -1,6 +1,7 @@
 ![Aero Hand Overview](assets/banner.png)
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2608.28578"><img src="https://img.shields.io/badge/arXiv-2608.28578-b31b1b?logo=arxiv" alt="arXiv"></a>
   <a href="https://tetheria.github.io/aero-hand-open/"><img src="https://img.shields.io/badge/project-page-brightgreen" alt="Project Page"></a>
   <a href="https://docs.tetheria.ai/"><img src="https://img.shields.io/badge/doc-page-orange" alt="Documentation"></a>
   <!-- <a href="https://github.com/TetherIA/aero-hand-open/issues"><img src="https://img.shields.io/github/issues/RoboVerseOrg/RoboVerse?color=yellow" alt="Issues"></a> -->
@@ -16,6 +17,7 @@ Aero Hand Open is an **open-source**, **tendon-driven** robotic hand designed an
 
 Each joint is optimized for mechanical efficiency through tendon actuation, enabling smooth and natural motion while maintaining a **lightweight** and **compact** design, making it perfect for research labs, educational institutions, and robotics enthusiasts who need an **affordable** yet **capable** manipulation platform.
 
+> **📄 Paper:** [Aero Hand Open: A Simulation-Ready Tendon-Driven Hand for Dexterous Manipulation Learning](https://arxiv.org/abs/2608.28578) (arXiv:2608.28578)   
 > **📚 Learn More:** https://tetheria.github.io/aero-hand-open/   
 > **🛒 Shop:** https://shop.tetheria.ai/
 
@@ -43,6 +45,7 @@ Each joint is optimized for mechanical efficiency through tendon actuation, enab
   - [Simulation](#simulation)
   - [Reinforcement Learning](#reinforcement-learning-tools)
 - [Getting help](#Getting-help)
+- [Citation](#citation)
 - [License — TL;DR](#license--tldr)
 - [Disclaimer](#disclaimer)
 - [Project Updates & Community](#project-updates--community)
@@ -162,6 +165,25 @@ An example of deploying trained policies in ROS is also provided in the [`ros2/`
 - Quick questions, live debugging, voice/screen‑share
 - Social chat, lab intros, "I printed my first hand!"
 - Live events and office hours
+
+# Citation
+
+If you use Aero Hand Open in your research, please cite our paper:
+
+> Nan Wang, Mohit Yadav, Jonathan Wulff, Aidan Rosenbaum, Kezhou Chen, Yuvan Sharma, Xu Dong, Yiwei Tao.
+> **Aero Hand Open: A Simulation-Ready Tendon-Driven Hand for Dexterous Manipulation Learning.** arXiv:2608.28578, 2026.
+> [📄 arXiv](https://arxiv.org/abs/2608.28578) · [PDF](https://arxiv.org/pdf/2608.28578)
+
+```bibtex
+@article{wang2026aerohandopen,
+  title   = {Aero Hand Open: A Simulation-Ready Tendon-Driven Hand for Dexterous Manipulation Learning},
+  author  = {Wang, Nan and Yadav, Mohit and Wulff, Jonathan and Rosenbaum, Aidan and
+             Chen, Kezhou and Sharma, Yuvan and Dong, Xu and Tao, Yiwei},
+  journal = {arXiv preprint arXiv:2608.28578},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2608.28578}
+}
+```
 
 # License — TL;DR
 
