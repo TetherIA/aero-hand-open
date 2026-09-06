@@ -988,3 +988,53 @@ a:focus {
     box-shadow: none !important;
   }
 }
+
+/* Rebrand notice banner */
+.rebrand-banner {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  padding: 0.85rem 1.25rem;
+}
+
+.rebrand-banner-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.rebrand-banner p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.rebrand-banner strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.rebrand-banner i {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+@media screen and (max-width: 640px) {
+  .rebrand-banner {
+    padding: 0.75rem 1rem;
+  }
+
+  .rebrand-banner-inner {
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .rebrand-banner p {
+    font-size: 0.85rem;
+  }
+}
